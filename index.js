@@ -11,9 +11,7 @@ import { UserController, PostController } from './controllers/index.js'
 import { checkAuth, handleValidationErrors } from './utils/index.js'
 
 mongoose
-	.connect(
-		'mongodb+srv://Aziz:www@aziz.bbmzox1.mongodb.net/blog?retryWrites=true&w=majority'
-	)
+	.connect(process.env.MONGODB_URI)
 	.then(() => {
 		console.log('Connected to MongoDB')
 	})
@@ -71,9 +69,8 @@ app.post('/posts', checkAuth, postCreateValidation, PostController.create)
 app.post('/posts/:id/comments', checkAuth, PostController.createComment)
 app.delete('/posts/:id', checkAuth, PostController.remove)
 app.patch('/posts/:id', checkAuth, PostController.updateViews)
-// app.put('/posts/:id', PostController.update)
 
-app.listen(4444, err => {
+app.listen(process.env.PORT || 4444, err => {
 	if (err) {
 		return console.log('something bad happened', err)
 	}
