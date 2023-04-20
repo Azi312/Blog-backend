@@ -1,6 +1,5 @@
 import Post from '../models/Post.js'
 import User from '../models/User.js'
-import Comment from '../models/Comment.js'
 
 export const getAll = async (req, res) => {
 	try {
@@ -54,13 +53,6 @@ export const getLastTags = async (req, res) => {
 }
 export const getComments = async (req, res) => {
 	try {
-		// const posts = await Post.find().exec()
-
-		// const commentsSet = new Set(posts.map(post => post.comments).flat())
-
-		// const comments = Array.from(commentsSet)
-		// console.log(comments)
-		// res.json(comments)
 		const posts = await Post.find().limit(5).exec()
 
 		const comments = posts
