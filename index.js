@@ -1,5 +1,4 @@
 import express from 'express'
-import fs from 'fs'
 import mongoose from 'mongoose'
 import cloudinary from './utils/cloudinary.js'
 import multer from 'multer'
@@ -25,16 +24,7 @@ mongoose
 const app = express()
 const port = 4444
 
-const storage = multer.diskStorage({
-	destination: (_, __, cb) => {
-		cb(null, 'uploads')
-	},
-	filename: (_, file, cb) => {
-		cb(null, file.originalname)
-	},
-})
-
-const upload = multer({ storage })
+const upload = multer({ dest: 'uploads/' })
 
 app.use(express.json())
 app.use(cors())
@@ -57,7 +47,6 @@ app.get('/auth/me', checkAuth, UserController.getMe)
 app.post('/upload', upload.single('image'), async (req, res) => {
 	try {
 		const result = await cloudinary.uploader.upload(req.file.path)
-
 		res.json({ url: result.secure_url })
 	} catch (err) {
 		console.error(err)
