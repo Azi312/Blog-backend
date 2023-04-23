@@ -1,5 +1,6 @@
 import Post from '../models/Post.js'
 import User from '../models/User.js'
+import cloudinary from 'cloudinary'
 
 export const getAll = async (req, res) => {
 	try {
@@ -116,7 +117,9 @@ export const createComment = async (req, res) => {
 			return res.status(404).json({ message: 'Post not found' })
 		}
 
-		res.json(post)
+		const posts = await post.save()
+
+		res.json(posts)
 	} catch (error) {
 		console.log(error)
 		res.status(500).json({
@@ -158,7 +161,6 @@ export const getById = async (req, res) => {
 export const remove = async (req, res) => {
 	try {
 		const postId = req.params.id
-
 		await Post.findOneAndDelete({ _id: postId }).then(doc => {
 			if (!doc) {
 				return res.status(404).json({ message: 'Filed to delete post' })

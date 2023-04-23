@@ -1,8 +1,9 @@
 import express from 'express'
 import mongoose from 'mongoose'
-import fs from 'fs'
+import cloudinary from './utils/cloudinary.js'
 import multer from 'multer'
 import cors from 'cors'
+
 import {
 	registerValidation,
 	loginValidation,
@@ -23,19 +24,7 @@ mongoose
 const app = express()
 const port = 4444
 
-const storage = multer.diskStorage({
-	destination: (_, __, cb) => {
-		if (!fs.existsSync('uploads')) {
-			fs.mkdirSync('uploads')
-		}
-		cb(null, 'uploads')
-	},
-	filename: (_, file, cb) => {
-		cb(null, file.originalname)
-	},
-})
-
-const upload = multer({ storage })
+const upload = multer({ dest: 'uploads/' })
 
 app.use(express.json())
 app.use(cors())
@@ -55,10 +44,15 @@ app.post(
 )
 app.get('/auth/me', checkAuth, UserController.getMe)
 
-app.post('/upload', upload.single('image'), (req, res) => {
-	res.json({
-		url: `/uploads/${req.file.originalname}`,
-	})
+app.post('/upload', upload.single('image'), async (req, res) => {
+	try {
+		const result = await cloudinary.uploader.upload(req.file.path)
+
+		res.json({ url: result.secure_url })
+	} catch (err) {
+		console.error(err)
+		res.status(500).json({ message: 'Failed to upload image' })
+	}
 })
 
 app.get('/tags', PostController.getLastTags)
@@ -78,5 +72,5 @@ app.listen(process.env.PORT || 4444, err => {
 	if (err) {
 		return console.log('something bad happened', err)
 	}
-	console.log(`Example app listening on port ${port}`)
+	console.log(`App listening on port ${port}`)
 })
