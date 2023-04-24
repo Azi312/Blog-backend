@@ -24,6 +24,7 @@ mongoose
 const app = express()
 const port = 4444
 
+// const upload = multer({ dest: 'uploads/', dest: 'uploads-avatar/' })
 const upload = multer({ dest: 'uploads/' })
 
 app.use(express.json())
@@ -43,6 +44,17 @@ app.post(
 	UserController.register
 )
 app.get('/auth/me', checkAuth, UserController.getMe)
+
+app.post('/upload-avatar', upload.single('avatar'), async (req, res) => {
+	try {
+		const result = await cloudinary.uploader.upload(req.file.path)
+		console.log(result.secure_url)
+		res.json({ url: result.secure_url })
+	} catch (error) {
+		console.log(error)
+		res.status(500).json({ message: 'Failed to upload avatar' })
+	}
+})
 
 app.post('/upload', upload.single('image'), async (req, res) => {
 	try {

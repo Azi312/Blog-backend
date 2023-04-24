@@ -8,7 +8,7 @@ export const registerValidation = [
 	body('email').isEmail(),
 	body('password').isLength({ min: 5 }),
 	body('fullName').isLength({ min: 5 }),
-	body('avatarUrl').optional().isURL(),
+	body('avatarUrl').optional().isString(),
 ]
 export const postCreateValidation = [
 	body('title', 'enter the title of the article').isLength({ min: 3 }),
