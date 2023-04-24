@@ -29,7 +29,7 @@ const upload = multer({ dest: 'uploads/' })
 
 app.use(express.json())
 app.use(cors())
-app.use('/uploads', express.static('uploads'))
+// app.use('/uploads', express.static('uploads'))
 
 app.post(
 	'/auth/login',
