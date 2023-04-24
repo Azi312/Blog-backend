@@ -24,12 +24,11 @@ mongoose
 const app = express()
 const port = 4444
 
-// const upload = multer({ dest: 'uploads/', dest: 'uploads-avatar/' })
 const upload = multer({ dest: 'uploads/' })
 
 app.use(express.json())
 app.use(cors())
-// app.use('/uploads', express.static('uploads'))
+app.use('/uploads', express.static('uploads'))
 
 app.post(
 	'/auth/login',
