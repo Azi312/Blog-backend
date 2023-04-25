@@ -95,17 +95,23 @@ export const create = async (req, res) => {
 export const createComment = async (req, res) => {
 	try {
 		const postId = req.params.id
-		const comment = {
-			text: req.body.text,
-			user: {},
-			createdAt: new Date(),
-		}
+		const { text } = req.body
 
 		const user = await User.findById(req.userId)
 
-		comment.user.id = user._id
-		comment.user.fullName = user.fullName
-		comment.user.avatarUrl = user.avatarUrl
+		if (!user) {
+			return res.status(404).json({ message: 'User not found' })
+		}
+
+		const comment = {
+			text,
+			user: {
+				id: user._id,
+				fullName: user.fullName,
+				avatarUrl: user.avatarUrl,
+			},
+			createdAt: new Date(),
+		}
 
 		const post = await Post.findByIdAndUpdate(
 			postId,
@@ -117,16 +123,48 @@ export const createComment = async (req, res) => {
 			return res.status(404).json({ message: 'Post not found' })
 		}
 
-		const posts = await post.save()
-
-		res.json(posts)
+		res.json(post)
 	} catch (error) {
 		console.log(error)
-		res.status(500).json({
-			message: 'Failed to create comment',
-		})
+		res.status(500).json({ message: 'Failed to create comment' })
 	}
 }
+
+// export const createComment = async (req, res) => {
+// 	try {
+// 		const postId = req.params.id
+// 		const comment = {
+// 			text: req.body.text,
+// 			user: {},
+// 			createdAt: new Date(),
+// 		}
+
+// 		const user = await User.findById(req.userId)
+
+// 		comment.user.id = user._id
+// 		comment.user.fullName = user.fullName
+// 		comment.user.avatarUrl = user.avatarUrl
+
+// 		const post = await Post.findByIdAndUpdate(
+// 			postId,
+// 			{ $push: { comments: comment } },
+// 			{ new: true }
+// 		)
+
+// 		if (!post) {
+// 			return res.status(404).json({ message: 'Post not found' })
+// 		}
+
+// 		const posts = await post.save()
+
+// 		res.json(posts)
+// 	} catch (error) {
+// 		console.log(error)
+// 		res.status(500).json({
+// 			message: 'Failed to create comment',
+// 		})
+// 	}
+// }
 
 export const getById = async (req, res) => {
 	try {
@@ -139,11 +177,6 @@ export const getById = async (req, res) => {
 		)
 			.populate('user')
 			.then(doc => {
-				// if (err) {
-				// 	console.log(err)
-				// 	return res.status(500).json({ message: 'Failed to get post' })
-				// }
-
 				if (!doc) {
 					return res.status(404).json({ message: 'Post not found' })
 				}
