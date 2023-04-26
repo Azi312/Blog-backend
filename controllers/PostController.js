@@ -1,6 +1,5 @@
 import Post from '../models/Post.js'
 import User from '../models/User.js'
-import cloudinary from 'cloudinary'
 
 export const getAll = async (req, res) => {
 	try {
@@ -130,42 +129,6 @@ export const createComment = async (req, res) => {
 	}
 }
 
-// export const createComment = async (req, res) => {
-// 	try {
-// 		const postId = req.params.id
-// 		const comment = {
-// 			text: req.body.text,
-// 			user: {},
-// 			createdAt: new Date(),
-// 		}
-
-// 		const user = await User.findById(req.userId)
-
-// 		comment.user.id = user._id
-// 		comment.user.fullName = user.fullName
-// 		comment.user.avatarUrl = user.avatarUrl
-
-// 		const post = await Post.findByIdAndUpdate(
-// 			postId,
-// 			{ $push: { comments: comment } },
-// 			{ new: true }
-// 		)
-
-// 		if (!post) {
-// 			return res.status(404).json({ message: 'Post not found' })
-// 		}
-
-// 		const posts = await post.save()
-
-// 		res.json(posts)
-// 	} catch (error) {
-// 		console.log(error)
-// 		res.status(500).json({
-// 			message: 'Failed to create comment',
-// 		})
-// 	}
-// }
-
 export const getById = async (req, res) => {
 	try {
 		const postId = req.params.id
@@ -208,6 +171,35 @@ export const remove = async (req, res) => {
 		res.status(500).json({
 			message: 'Failed to delete post',
 		})
+	}
+}
+
+export const removeComment = async (req, res) => {
+	try {
+		const { postId, commentId } = req.params
+
+		const post = await Post.findOne({ _id: postId })
+
+		if (!post) {
+			return res.status(404).json({ message: 'Post not found' })
+		}
+
+		const commentIndex = post.comments.findIndex(
+			comment => comment._id.toString() === commentId.toString()
+		)
+
+		if (commentIndex === -1) {
+			return res.status(404).json({ message: 'Comment not found' })
+		}
+
+		post.comments.splice(commentIndex, 1)
+
+		await post.save()
+
+		res.status(200).json({ message: 'Comment deleted successfully' })
+	} catch (error) {
+		console.log(error)
+		res.status(500).json({ message: 'Something went wrong' })
 	}
 }
 

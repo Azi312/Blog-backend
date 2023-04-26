@@ -76,6 +76,11 @@ app.get('/posts/:id', PostController.getById)
 app.post('/posts', checkAuth, postCreateValidation, PostController.create)
 app.post('/posts/:id/comments', checkAuth, PostController.createComment)
 app.delete('/posts/:id', checkAuth, PostController.remove)
+app.delete(
+	'/posts/:postId/comments/:commentId',
+	checkAuth,
+	PostController.removeComment
+)
 app.patch('/posts/:id', checkAuth, PostController.updateViews)
 
 app.listen(process.env.PORT || 4444, err => {
