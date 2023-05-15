@@ -13,13 +13,4 @@ const commentSchema = new mongoose.Schema(
 	{ timestamps: true }
 )
 
-;(commentSchema.methods.remove = async function () {
-	await this.model('Post').updateOne(
-		{ _id: this.post },
-		{ $pull: { comments: this._id } }
-	)
-	await this.deleteOne()
-}),
-	{ suppressWarning: true }
-
 export default mongoose.model('Comment', commentSchema)
